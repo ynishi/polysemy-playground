@@ -14,10 +14,10 @@ import Database (
   Person (..),
   PersonNoId (..),
  )
-import DatabaseEff (
-  DatabaseEff,
+import Application (
+  ApplicationEff,
   createPerson,
-  databaseEffToIO,
+  applicationEffToIO,
   destroyPerson,
   listPersons,
   readPerson,
@@ -53,7 +53,7 @@ data Routes route = Routes
 api :: Proxy (ToServantApi Routes)
 api = genericApi (Proxy :: Proxy Routes)
 
-record :: Member DatabaseEff r => Routes (AsServerT (Sem r))
+record :: Member ApplicationEff r => Routes (AsServerT (Sem r))
 record =
   Routes
     { _get = listPersons
@@ -72,7 +72,7 @@ app conn = return $ genericServeT (interpretServer conn) record
         . runError @DbErr
         . runLogAction @IO logMessageStdout
         . runReader c
-        . databaseEffToIO
+        . applicationEffToIO
     liftToHandler = Handler . ExceptT . fmap handleErrors
 
 handleErrors :: Either DbErr a -> Either ServerError a

@@ -4,7 +4,7 @@
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE TypeApplications #-}
 
-module DatabaseEff where
+module Application where
 
 import Colog.Core (Severity (..))
 import Colog.Polysemy (Log, log)
@@ -34,24 +34,24 @@ note :: Member (Error e) r => e -> Maybe a -> Sem r a
 note e Nothing = throw e
 note _ (Just a) = pure a
 
-data DatabaseEff m a where
-  MakeTablesIfNotExists :: DatabaseEff m ()
-  ListPersons :: Maybe Text -> Maybe Int64 -> Maybe Text -> DatabaseEff m [Person]
-  CreatePerson :: PersonNoId -> DatabaseEff m Person
-  ReadPerson :: Int64 -> DatabaseEff m Person
-  UpdatePerson :: Person -> DatabaseEff m Person
-  DestroyPerson :: Person -> DatabaseEff m ()
+data ApplicationEff m a where
+  MakeTablesIfNotExists :: ApplicationEff m ()
+  ListPersons :: Maybe Text -> Maybe Int64 -> Maybe Text -> ApplicationEff m [Person]
+  CreatePerson :: PersonNoId -> ApplicationEff m Person
+  ReadPerson :: Int64 -> ApplicationEff m Person
+  UpdatePerson :: Person -> ApplicationEff m Person
+  DestroyPerson :: Person -> ApplicationEff m ()
 
-makeSem ''DatabaseEff
+makeSem ''ApplicationEff
 
 runQuery :: String -> SqliteM c -> IO c
 runQuery s q = bracket (open s) close (`runBeamSqlite` q)
 
-databaseEffToIO ::
+applicationEffToIO ::
   Members '[Embed IO, Reader String, Log Message, Error DbErr] r =>
-  Sem (DatabaseEff ': r) a ->
+  Sem (ApplicationEff ': r) a ->
   Sem r a
-databaseEffToIO sem = do
+applicationEffToIO sem = do
   conn_s <- ask @String
   interpret
     ( \case

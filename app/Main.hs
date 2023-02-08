@@ -3,8 +3,8 @@
 module Main where
 
 import Api
-import DatabaseEff (
-  databaseEffToIO,
+import Application (
+  applicationEffToIO,
   makeTablesIfNotExists,
  )
 
@@ -28,7 +28,7 @@ main = do
       . runError @DbErr
       . runLogAction @IO logMessageStdout
       . runReader dbName
-      . databaseEffToIO
+      . applicationEffToIO
       $ makeTablesIfNotExists
   app' <- app dbName
   Warp.run 8081 app'
