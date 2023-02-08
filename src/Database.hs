@@ -21,25 +21,12 @@ import Database.Beam.Sqlite.Connection (Sqlite)
 import Database.SQLite.Simple (Connection, execute_)
 import GHC.Int (Int64)
 
+import Domain
+
 data DbErr
   = PersonAlreadyExists Text
   | PersonIdDoesNotExist Int64
   | PersonDoesNotExist Text
-
-data PersonNoId = PersonNoId
-  { name :: Text
-  , age :: Int64
-  , address :: Text
-  }
-  deriving (Show, Generic, ToJSON, FromJSON)
-
-data Person = Person
-  { pKey :: Int64
-  , name :: Text
-  , age :: Int64
-  , address :: Text
-  }
-  deriving (Eq, Show, Generic, ToJSON, FromJSON)
 
 toPerson :: Person_ -> Person
 toPerson Person_ {..} = Person _personId _personName _personAge _personAddress
@@ -108,9 +95,9 @@ listPersons mName mAge mAddr =
 
 createPerson ::
   (MonadFail m, MonadBeam Sqlite m, MonadBeamInsertReturning Sqlite m) =>
-  PersonNoId ->
+  CreatePersonReq ->
   m (Either DbErr Person)
-createPerson PersonNoId {..} = do
+createPerson CreatePersonReq {..} = do
   persons_ <- listPersons (Just name) Nothing Nothing
   if null persons_
     then do

@@ -1,4 +1,6 @@
-cabal-version: 1.12
+cabal-version:      1.12
+
+-- ghc version: 9.0.2
 
 -- This file has been generated from package.yaml by hpack version 0.35.1.
 --
@@ -28,6 +30,7 @@ library
       Api
       Database
       Application
+      Domain
       Lib
       Message
   other-modules:

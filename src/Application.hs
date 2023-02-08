@@ -28,6 +28,8 @@ import Polysemy.Error (Error, fromEither, throw)
 import Polysemy.Reader (Reader, ask)
 import Prelude hiding (log)
 
+import Domain
+
 -- This function is defined in Polysemy.Error for 1.3.0.0
 -- however w/ 1.3.0.0 this code won't compile on my machine
 note :: Member (Error e) r => e -> Maybe a -> Sem r a
@@ -37,7 +39,7 @@ note _ (Just a) = pure a
 data ApplicationEff m a where
   MakeTablesIfNotExists :: ApplicationEff m ()
   ListPersons :: Maybe Text -> Maybe Int64 -> Maybe Text -> ApplicationEff m [Person]
-  CreatePerson :: PersonNoId -> ApplicationEff m Person
+  CreatePerson :: CreatePersonReq -> ApplicationEff m Person
   ReadPerson :: Int64 -> ApplicationEff m Person
   UpdatePerson :: Person -> ApplicationEff m Person
   DestroyPerson :: Person -> ApplicationEff m ()

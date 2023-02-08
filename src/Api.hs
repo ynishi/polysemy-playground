@@ -11,8 +11,10 @@ import qualified Data.Text.Lazy as L
 import Data.Text.Lazy.Encoding (encodeUtf8)
 import Database (
   DbErr (..),
+ )
+import Domain (
+  CreatePersonReq (..),
   Person (..),
-  PersonNoId (..),
  )
 import Application (
   ApplicationEff,
@@ -44,7 +46,7 @@ type QPStrict = QueryParam' '[Strict, Required]
 data Routes route = Routes
   { _get :: route :- "person" :> QueryParam "name" Text :> QueryParam "age" Int64 :> QueryParam "address" Text :> Get '[JSON] [Person]
   , _getById :: route :- "person" :> Capture "id" Int64 :> Get '[JSON] Person
-  , _post :: route :- "person" :> ReqBody '[JSON] PersonNoId :> Post '[JSON] Person
+  , _post :: route :- "person" :> ReqBody '[JSON] CreatePersonReq :> Post '[JSON] Person
   , _put :: route :- "person" :> ReqBody '[JSON] Person :> Put '[JSON] Person
   , _delete :: route :- "person" :> ReqBody '[JSON] Person :> Delete '[JSON] ()
   }
